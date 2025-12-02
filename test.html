@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cybersecurity Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background:  rgb(250, 250, 250);
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .quiz-container {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(18px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 420px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.4);
+            transform: translateY(30px);
+            opacity: 0;
+            animation: fadeUp 0.7s ease forwards;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 15px;
+            animation: fade 0.5s ease;
+        }
+        @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+        .options button {
+            width: 100%;
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .options button:hover {
+            background: #475569;
+            transform: scale(1.03);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        #next-btn {
+            display: none;
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #0ea5e9;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 17px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        #next-btn:hover { background: #0284c7; }
+
+        /* NEW BUTTONS */
+        .bottom-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .bottom-buttons button {
+            width: 48%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        #restart-btn {
+            background: #10b981;
+            color: white;
+        }
+        #restart-btn:hover {
+            background: #059669;
+        }
+
+        #home-btn {
+            background: #f43f5e;
+            color: white;
+        }
+        #home-btn:hover {
+            background: #e11d48;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Cybersecurity Quiz</h1>
+        <div id="question" class="question"></div>
+        <div class="options" id="options"></div>
+        <button id="next-btn" onclick="nextQuestion()">Next</button>
+
+        <div id="result"></div>
+
+        <!-- NEW BUTTONS -->
+        <div class="bottom-buttons" id="extra-buttons" style="display:none;">
+            <button id="restart-btn" onclick="restartQuiz()">Restart</button>
+            <button id="home-btn" onclick="goHome()">Home</button>
+        </div>
+    </div>
+
+<script>
+    const quiz = [
+        { q: "What is phishing?", o: ["Fake attempts to steal data", "A type of firewall", "Secure login method"], a: 0 },
+        { q: "What makes a strong password?", o: ["Short and easy", "Repeating old passwords", "Long, unique, and mixed characters"], a: 2 },
+        { q: "What should you do before clicking a link?", o: ["Click immediately", "Hover to verify URL", "Share it first"], a: 1 },
+        { q: "What does 2FA add?", o: ["Second security layer", "Faster login", "More ads"], a: 0 },
+        { q: "What is malware?", o: ["Helpful software", "Malicious software", "A password tool"], a: 1 }
+    ];
+
+    let index = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = quiz[index];
+        document.getElementById("question").innerText = q.q;
+        const optionsDiv = document.getElementById("options");
+        optionsDiv.innerHTML = "";
+
+        q.o.forEach((opt, i) => {
+            const btn = document.createElement("button");
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(choice, btn) {
+        const buttons = document.querySelectorAll('#options button');
+        buttons.forEach(b => b.style.pointerEvents = "none");
+
+        if (choice === quiz[index].a) {
+            score++;
+            btn.style.background = "#16a34a";
+        } else {
+            btn.style.background = "#dc2626";
+            buttons[quiz[index].a].style.background = "#16a34a";
+        }
+
+        document.getElementById("next-btn").style.display = "block";
+    }
+
+    function nextQuestion() {
+        index++;
+        document.getElementById("next-btn").style.display = "none";
+
+        if (index < quiz.length) {
+            loadQuestion();
+        } else {
+            document.getElementById("question").style.display = "none";
+            document.getElementById("options").style.display = "none";
+            document.getElementById("result").innerHTML = `Your Score: ${score} / ${quiz.length}`;
+            document.getElementById("extra-buttons").style.display = "block";
+        }
+    }
+
+    function restartQuiz() {
+        index = 0;
+        score = 0;
+
+        document.getElementById("question").style.display = "block";
+        document.getElementById("options").style.display = "block";
+        document.getElementById("extra-buttons").style.display = "none";
+        document.getElementById("result").innerHTML = "";
+        
+        loadQuestion();
+    }
+
+    function goHome() {
+        window.location.href = "index.html"; // YOUR home page
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
